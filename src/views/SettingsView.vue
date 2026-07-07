@@ -73,7 +73,6 @@ const updateSetting = (key, value) => {
                 <div class="settings-summary-header">
                     <div>
                         <p class="eyebrow">Resumo automático</p>
-                        <h2>Descanso</h2>
                     </div>
                 </div>
 
