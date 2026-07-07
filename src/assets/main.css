@@ -13,6 +13,8 @@ body {
 
 .page-shell {
   padding: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 .summary-card {
@@ -100,6 +102,9 @@ body {
 .page-heading h1 {
   margin: 0;
   font-size: 1.5rem;
+}
+.page-card {
+  max-width: 1100px;
 }
 
 .page-actions,
