@@ -1,33 +1,41 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const pageTitle = computed(() => {
-  if (route.name === 'slots') return 'Espaços de Magia'
-  if (route.name === 'settings') return 'Configurações'
   if (route.name === 'spell-detail') return 'Magia'
+  if (route.name === 'settings') return 'Configurações'
   return 'Grimório'
 })
 </script>
 
 <template>
-  <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Livro de Magias</p>
-        <h1>{{ pageTitle }}</h1>
-      </div>
-      <nav class="topnav">
-        <RouterLink to="/">Magias</RouterLink>
-        <RouterLink to="/espacos">Espaços de Magia</RouterLink>
-        <RouterLink to="/configuracoes">Configurações</RouterLink>
-      </nav>
-    </header>
+  <PineApp>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Livro de Magias</p>
+          <h1>{{ pageTitle }}</h1>
+        </div>
+        <nav class="topnav" role="tablist">
+          <button type="button" class="tab-link" :class="{ active: route.path === '/' }" @click="router.push('/')">
+            <PineIcon name="BookOpen" color="currentColor" size="18" />
+            <span>Grimório</span>
+          </button>
+          <button type="button" class="tab-link" :class="{ active: route.name === 'settings' }"
+            @click="router.push({ name: 'settings' })">
+            <PineIcon name="Cog6Tooth" color="currentColor" size="18" />
+            <span>Configurações</span>
+          </button>
+        </nav>
+      </header>
 
-    <RouterView />
-  </div>
+      <RouterView />
+    </div>
+  </PineApp>
 </template>
 
 <style scoped>
@@ -57,18 +65,25 @@ const pageTitle = computed(() => {
   gap: 1rem;
 }
 
-.topnav a {
+.topnav .tab-link {
   padding: 0.65rem 0.9rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   color: var(--color-text);
   transition: 180ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.topnav a.router-link-active {
-  background: var(--color-highlight);
-  color: #111;
-  border-color: var(--color-highlight);
+.topnav .tab-link.active {
+  background: #1f5d35;
+  color: #f4fff6;
+  border-color: #1f5d35;
 }
 
 @media (max-width: 768px) {

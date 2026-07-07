@@ -10,12 +10,21 @@ import {
 } from '../services/localStorage'
 
 export const useGrimorioStore = defineStore('grimorio', () => {
-  const spells = ref(readJSON(STORAGE_KEYS.spells, defaultSpells))
+  const normalizeSpell = (spell) => ({
+    ...spell,
+    id: spell.id || `spell-${Date.now()}`,
+    nivel: Number(spell.nivel) || 0,
+    ritual: Boolean(spell.ritual),
+    concentracao: Boolean(spell.concentracao),
+    preparada: Number(spell.nivel) > 0 ? Boolean(spell.preparada) : false,
+  })
+
+  const spells = ref((readJSON(STORAGE_KEYS.spells, defaultSpells) || []).map(normalizeSpell))
   const settings = ref(readJSON(STORAGE_KEYS.settings, defaultSettings))
   const slots = ref(readJSON(STORAGE_KEYS.slots, defaultSlots))
 
-  const knownCount = computed(() => spells.value.length)
-  const preparedCount = computed(() => spells.value.filter((spell) => spell.preparada).length)
+  const knownCount = computed(() => spells.value.filter((spell) => spell.nivel > 0).length)
+  const preparedCount = computed(() => spells.value.filter((spell) => spell.nivel > 0 && spell.preparada).length)
   const cantripCount = computed(() => spells.value.filter((spell) => spell.nivel === 0).length)
 
   const persistSpells = () => writeJSON(STORAGE_KEYS.spells, spells.value)
@@ -23,14 +32,7 @@ export const useGrimorioStore = defineStore('grimorio', () => {
   const persistSlots = () => writeJSON(STORAGE_KEYS.slots, slots.value)
 
   const addSpell = (spell) => {
-    const normalizedSpell = {
-      ...spell,
-      id: spell.id || `spell-${Date.now()}`,
-      nivel: Number(spell.nivel) || 0,
-      ritual: Boolean(spell.ritual),
-      concentracao: Boolean(spell.concentracao),
-      preparada: Boolean(spell.preparada),
-    }
+    const normalizedSpell = normalizeSpell(spell)
 
     spells.value = [normalizedSpell, ...spells.value]
     persistSpells()
@@ -38,7 +40,9 @@ export const useGrimorioStore = defineStore('grimorio', () => {
   }
 
   const updateSpell = (id, spell) => {
-    spells.value = spells.value.map((item) => (item.id === id ? { ...item, ...spell } : item))
+    spells.value = spells.value.map((item) =>
+      item.id === id ? normalizeSpell({ ...item, ...spell }) : item,
+    )
     persistSpells()
   }
 
@@ -49,7 +53,9 @@ export const useGrimorioStore = defineStore('grimorio', () => {
 
   const togglePrepared = (id) => {
     spells.value = spells.value.map((spell) =>
-      spell.id === id ? { ...spell, preparada: !spell.preparada } : spell,
+      spell.id === id
+        ? { ...spell, preparada: spell.nivel > 0 ? !spell.preparada : false }
+        : spell,
     )
     persistSpells()
   }
