@@ -1,8 +1,38 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useGrimorioStore } from '../stores/grimorio'
 
 const store = useGrimorioStore()
+
+const importJson = ref('')
+
+const handleImport = () => {
+    if (!importJson.value.trim()) {
+        alert('Informe um JSON.')
+        return
+    }
+
+    try {
+        const parsed = JSON.parse(importJson.value)
+
+        const spells = Array.isArray(parsed)
+            ? parsed
+            : parsed.spells
+
+        if (!Array.isArray(spells)) {
+            throw new Error('Formato inválido')
+        }
+
+        store.importSpells(spells)
+
+        importJson.value = ''
+
+        alert(`${spells.length} feitiço(s) importado(s) com sucesso!`)
+    } catch (error) {
+        console.error(error)
+        alert('JSON inválido ou em formato não suportado.')
+    }
+}
 
 const proficiencyBonus = computed(() => {
     const level = Number(store.settings.nivel || 1)
@@ -99,6 +129,21 @@ const updateSetting = (key, value) => {
                     </div>
                 </div>
             </div>
+            <div class="import-section">
+                <div class="import-header">
+                    <p class="eyebrow">Importação</p>
+                    <span>Cole um JSON contendo uma lista de feitiços.</span>
+                </div>
+
+                <div class="import-actions">
+                    <PineTextField v-model="importJson" placeholder="Cole o JSON aqui..." />
+
+                    <PineBtn @click="handleImport">
+                        Importar Feitiços
+                    </PineBtn>
+                </div>
+            </div>
         </section>
     </main>
+
 </template>

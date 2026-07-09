@@ -24,7 +24,9 @@ export const useGrimorioStore = defineStore('grimorio', () => {
   const slots = ref(readJSON(STORAGE_KEYS.slots, defaultSlots))
 
   const knownCount = computed(() => spells.value.filter((spell) => spell.nivel > 0).length)
-  const preparedCount = computed(() => spells.value.filter((spell) => spell.nivel > 0 && spell.preparada).length)
+  const preparedCount = computed(
+    () => spells.value.filter((spell) => spell.nivel > 0 && spell.preparada).length,
+  )
   const cantripCount = computed(() => spells.value.filter((spell) => spell.nivel === 0).length)
 
   const persistSpells = () => writeJSON(STORAGE_KEYS.spells, spells.value)
@@ -50,12 +52,28 @@ export const useGrimorioStore = defineStore('grimorio', () => {
     spells.value = spells.value.filter((spell) => spell.id !== id)
     persistSpells()
   }
+  const importSpells = (spellList, { replace = false } = {}) => {
+    if (!Array.isArray(spellList)) {
+      throw new Error('Arquivo inválido.')
+    }
 
+    const normalized = spellList.map(normalizeSpell)
+
+    if (replace) {
+      spells.value = normalized
+    } else {
+      const existingIds = new Set(spells.value.map((s) => s.id))
+
+      const newSpells = normalized.filter((spell) => !existingIds.has(spell.id))
+
+      spells.value = [...newSpells, ...spells.value]
+    }
+
+    persistSpells()
+  }
   const togglePrepared = (id) => {
     spells.value = spells.value.map((spell) =>
-      spell.id === id
-        ? { ...spell, preparada: spell.nivel > 0 ? !spell.preparada : false }
-        : spell,
+      spell.id === id ? { ...spell, preparada: spell.nivel > 0 ? !spell.preparada : false } : spell,
     )
     persistSpells()
   }
@@ -93,5 +111,6 @@ export const useGrimorioStore = defineStore('grimorio', () => {
     togglePrepared,
     updateSettings,
     setSlotUsage,
+    importSpells,
   }
 })

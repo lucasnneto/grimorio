@@ -670,3 +670,29 @@ label {
     align-items: flex-start;
   }
 }
+.import-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(47, 143, 75, 0.12);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(21, 21, 21, 0.94));
+}
+
+.import-header {
+  margin-bottom: 1rem;
+}
+
+.import-header span {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.import-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+}
+
+.import-actions > *:first-child {
+  flex: 1;
+}
