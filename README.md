@@ -45,5 +45,4 @@ npm run lint
 ## Observações
 
 - `favicon.svg` foi adicionado em `public/` e o título da página foi atualizado.
-- Para forçar um deploy de teste, faça um commit e dê push para `main`.
-
+- Para forçar um deploy de teste, faça um commit e dê push para `main`
